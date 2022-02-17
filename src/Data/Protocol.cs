@@ -131,6 +131,9 @@ namespace Microsoft.Jupyter.Core.Protocol
     [JsonObject(MemberSerialization.OptIn)]
     public class KernelInfoReplyContent : MessageContent
     {
+        [JsonProperty("status")]
+        public string Status => "ok";
+
         [JsonProperty("protocol_version")]
         public string ProtocolVersion { get => "5.2.0"; }
 
@@ -144,7 +147,7 @@ namespace Microsoft.Jupyter.Core.Protocol
         public LanguageInfo LanguageInfo { get; set; }
 
         [JsonProperty("banner")]
-        public string Banner { get; set; }
+        public string Banner { get; set; } = "";
 
         [JsonProperty("help_links")]
         public HelpLinks[] HelpLinks { get; set; }
@@ -228,7 +231,7 @@ namespace Microsoft.Jupyter.Core.Protocol
         public List<Dictionary<string, object>> Payloads { get; set; } = new List<Dictionary<string, object>>();
 
         [JsonProperty("user_expressions")]
-        public Dictionary<string, object> UserExpressions { get; set; }
+        public Dictionary<string, object> UserExpressions { get; set; } = new Dictionary<string, object>();
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -299,6 +302,31 @@ namespace Microsoft.Jupyter.Core.Protocol
 
         [JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
         public JToken RawData { get; set; } = null;
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class CommInfoRequestContent : MessageContent
+    {
+
+        [JsonProperty("target_name", NullValueHandling = NullValueHandling.Ignore)]
+        public string? TargetName { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class CommInfoReplyContent : MessageContent
+    {
+        [JsonObject(MemberSerialization.OptIn)]
+        public class Comm
+        {
+            [JsonProperty("target_name")]
+            public string TargetName { get; set; }
+        }
+
+        [JsonProperty("status")]
+        public string Status;
+
+        [JsonProperty("comms")]
+        public Dictionary<string, Comm> Comms;
     }
 
     [JsonObject]

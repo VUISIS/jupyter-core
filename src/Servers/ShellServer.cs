@@ -105,7 +105,12 @@ namespace Microsoft.Jupyter.Core
 
         private void SendMessage(NetMQSocket socket, string socketKind, Message message)
         {
-            // Add metadata for the current session if needed.
+            // Add empty metadata for the current session if needed.
+            if (message.Metadata == null)
+            {
+                message.Metadata = new Dictionary<string, string>();
+            }
+
             if (message.Header.Session == null)
             {
                 message.Header.Session = session;
