@@ -17,7 +17,7 @@ steps:
 
 - script: |
     conda info
-    pip install jupyter_kernel_test==0.3.0
+    pip install jupyter_kernel_test==0.4.3
   displayName: 'Install additional dependencies from pip'
 
 # The version of pyzmq on Anaconda does not seem to work in Windows agents
