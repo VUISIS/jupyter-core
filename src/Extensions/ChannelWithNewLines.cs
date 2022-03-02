@@ -39,6 +39,8 @@ namespace Microsoft.Jupyter.Core
         /// </summary>
         public IChannel BaseChannel { get; }
 
+        public Message CellMessage { get; set; }
+
         /// <summary>
         ///     Constructs a new channel, given a base channel to be wrapped
         ///     with newlines.

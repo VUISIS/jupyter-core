@@ -569,7 +569,6 @@ namespace Microsoft.Jupyter.Core
             using (var loggerFactory = new LoggerFactory())
             {
                 var logger = loggerFactory.CreateLogger(this.GetType().FullName);
-
                 serviceCollection
                     // For now, we add a logger that reports to the console.
                     // TODO: add a logger that reports back to the client.

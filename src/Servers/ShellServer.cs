@@ -40,6 +40,7 @@ namespace Microsoft.Jupyter.Core
         // that we are busy over the IOPub socket. For example, we skip that
         // step when responding to kernel_info_requests.
         private bool alive = false;
+        private bool once = true;
         private RouterSocket shellSocket;
         private Thread shellThread;
 
@@ -47,6 +48,10 @@ namespace Microsoft.Jupyter.Core
         private Thread controlThread;
 
         private PublisherSocket ioPubSocket;
+
+        private RouterSocket stdinSocket;
+
+        private Thread stdinThread;
 
         private ILogger<ShellServer> logger;
         private KernelContext context;
@@ -80,6 +85,8 @@ namespace Microsoft.Jupyter.Core
             controlSocket.Bind(context.ConnectionInfo.ControlZmqAddress);
             ioPubSocket = new PublisherSocket();
             ioPubSocket.Bind(context.ConnectionInfo.IoPubZmqAddress);
+            stdinSocket = new RouterSocket();
+            stdinSocket.Bind(context.ConnectionInfo.StdinZmqAddress);
 
             alive = true;
             controlThread = new Thread(() => EventLoop(controlSocket))
@@ -92,6 +99,11 @@ namespace Microsoft.Jupyter.Core
                 Name = "Shell server"
             };
             shellThread.Start();
+            /*stdinThread = new Thread(() => EventLoop(stdinSocket))
+            {
+                Name = "Stdin server"
+            };
+            stdinThread.Start();*/
         }
 
         public void SendShellMessage(Message message) =>
@@ -102,6 +114,14 @@ namespace Microsoft.Jupyter.Core
 
         public void SendIoPubMessage(Message message) =>
             SendMessage(ioPubSocket, "iopub", message);
+
+        public void SendStdinMessage(Message message) =>
+            SendMessage(stdinSocket, "stdin", message);
+
+        public Message ReceiveStdinMessage()
+        {
+            return stdinSocket.ReceiveMessage(context);
+        }
 
         private void SendMessage(NetMQSocket socket, string socketKind, Message message)
         {
@@ -127,18 +147,8 @@ namespace Microsoft.Jupyter.Core
                     // Start by pulling off the next <action>_request message
                     // from the client.
                     var nextMessage = socket.ReceiveMessage(context);
-                    logger.LogDebug(
-                        $"Received new message:\n" +
-                        $"\t{JsonConvert.SerializeObject(nextMessage.Header)}\n" +
-                        $"\t{JsonConvert.SerializeObject(nextMessage.ParentHeader)}\n" +
-                        $"\t{JsonConvert.SerializeObject(nextMessage.Metadata)}\n" +
-                        $"\t{JsonConvert.SerializeObject(nextMessage.Content)}"
-                    );
 
-                    // If this is our first message, we need to set the session
-                    // id.
                     session ??= nextMessage.Header.Session;
-
                     // Get a service that can handle the message type and
                     // dispatch.
                     router.Handle(nextMessage);
@@ -226,14 +236,12 @@ namespace Microsoft.Jupyter.Core
 
         public virtual void OnShutdownRequest(Message message)
         {
-            // Before shutting down, call any event set by the
-            // engine.
             ShutdownRequest?.Invoke(message);
             System.Environment.Exit(0);
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue = false; 
 
         public event Action<Message> KernelInfoRequest;
         public event Action<Message> InterruptRequest;
@@ -248,6 +256,7 @@ namespace Microsoft.Jupyter.Core
                     shellSocket?.Dispose();
                     controlSocket?.Dispose();
                     ioPubSocket?.Dispose();
+                    stdinSocket?.Dispose();
                 }
                 disposedValue = true;
             }

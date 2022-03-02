@@ -116,6 +116,13 @@ namespace Microsoft.Jupyter.Core
                 return $"{protocol}://{IpAddress}:{IoPubPort}";
             }
         }
+
+        public string StdinZmqAddress {
+            get {
+                var protocol = Enum.GetName(typeof(Transport), Transport).ToLower();
+                return $"{protocol}://{IpAddress}:{StdInPort}";
+            }
+        }
         #endregion
 
         #region Diagnostic Support

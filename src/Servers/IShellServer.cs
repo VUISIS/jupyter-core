@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Jupyter.Core.Protocol;
 
 namespace Microsoft.Jupyter.Core
@@ -14,6 +12,10 @@ namespace Microsoft.Jupyter.Core
         void SendShellMessage(Message message);
 
         void SendIoPubMessage(Message message);
+
+        void SendStdinMessage(Message message);
+
+        public Message ReceiveStdinMessage();
 
         void Start();
     }

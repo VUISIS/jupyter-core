@@ -50,12 +50,13 @@ namespace Microsoft.Jupyter.Core
 
         internal class ExecutionChannel : IChannel
         {
-            private readonly Message parent;
             private readonly BaseEngine engine;
             private readonly ICommsRouter router;
+
+            public Message CellMessage { get; set; }
             public ExecutionChannel(BaseEngine engine, Message parent, ICommsRouter router)
             {
-                this.parent = parent;
+                this.CellMessage = parent;
                 this.engine = engine;
                 this.router = router;
             }
@@ -65,7 +66,7 @@ namespace Microsoft.Jupyter.Core
 
             public void Display(object displayable)
             {
-                engine.WriteDisplayData(parent, displayable);
+                engine.WriteDisplayData(CellMessage, displayable);
             }
 
             /// <summary>
@@ -82,7 +83,7 @@ namespace Microsoft.Jupyter.Core
                 {
                     DisplayId = Guid.NewGuid().ToString()
                 };
-                engine.WriteDisplayData(parent, displayable, transient);
+                engine.WriteDisplayData(CellMessage, displayable, transient);
                 return new UpdatableDisplay(this, transient.DisplayId);
             }
 
@@ -92,22 +93,22 @@ namespace Microsoft.Jupyter.Core
                 {
                     DisplayId = displayId
                 };
-                engine.WriteDisplayData(parent, displayable, transient, isUpdate: true);
+                engine.WriteDisplayData(CellMessage, displayable, transient, isUpdate: true);
             }
 
             public void Stderr(string message)
             {
-                engine.WriteToStream(parent, StreamName.StandardError, message);
+                engine.WriteToStream(CellMessage, StreamName.StandardError, message);
             }
 
             public void Stdout(string message)
             {
-                engine.WriteToStream(parent, StreamName.StandardOut, message);
+                engine.WriteToStream(CellMessage, StreamName.StandardOut, message);
             }
 
             public void SendIoPubMessage(Message message)
             {
-                engine.ShellServer.SendIoPubMessage(message.AsReplyTo(parent));
+                engine.ShellServer.SendIoPubMessage(message.AsReplyTo(message));
             }
         }
 

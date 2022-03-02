@@ -97,6 +97,7 @@ namespace Microsoft.Jupyter.Core.Protocol
                 ["execute_request"] = data => JsonConvert.DeserializeObject<ExecuteRequestContent>(data),
                 ["complete_request"] = data => JsonConvert.DeserializeObject<CompleteRequestContent>(data),
                 ["interrupt_request"] = data => new EmptyContent(),
+                ["input_reply"] = data => JsonConvert.DeserializeObject<InputReplyContent>(data),
                 ["shutdown_request"] = data => JsonConvert.DeserializeObject<ShutdownRequestContent>(data),
                 ["comm_open"] = data => JsonConvert.DeserializeObject<CommOpenContent>(data),
                 ["comm_msg"] = data => JsonConvert.DeserializeObject<CommMessageContent>(data),
@@ -151,6 +152,22 @@ namespace Microsoft.Jupyter.Core.Protocol
 
     }
 
+    [JsonObject(MemberSerialization.OptIn)]
+    public class InputRequestContent : MessageContent
+    {
+        [JsonProperty("prompt")]
+        public string Prompt { get; set; }
+
+        [JsonProperty("password")]
+        public bool Password { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class InputReplyContent : MessageContent
+    {
+        [JsonProperty("value")]
+        public string Value { get; set; }
+    }
     [JsonObject(MemberSerialization.OptIn)]
     public class ShutdownRequestContent : MessageContent
     {
