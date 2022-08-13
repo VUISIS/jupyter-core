@@ -1,5 +1,0 @@
-{
-    "files.associations": {
-        "**/ci/*.yml": "azure-pipelines"
-    }
-}
