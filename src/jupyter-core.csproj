@@ -2,7 +2,18 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworkIdentifier>.NETCOREAPP</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>6.0</TargetFrameworkVersion>
+    <Platforms>ARM64;x64</Platforms>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <PlatformTarget Condition="'$(Platform)' == 'x64'">x64</PlatformTarget>
+    <PlatformTarget Condition="'$(Platform)' == 'ARM64'">arm64</PlatformTarget>
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">bin/</BaseOutputPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">$(BaseOutputPath)$(Configuration)/Windows/$(Platform)/</OutputPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and $([MSBuild]::IsOSPlatform('Linux'))">$(BaseOutputPath)$(Configuration)/Linux/$(Platform)/</OutputPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and $([MSBuild]::IsOSPlatform('MacOS'))">$(BaseOutputPath)$(Configuration)/MacOS/$(Platform)/</OutputPath>
     <LangVersion>8.0</LangVersion>
 
     <AssemblyName>Microsoft.Jupyter.Core</AssemblyName>

@@ -464,3 +464,4 @@ _site/
 
 # Visual Studio Code
 .vscode/
+.DS_Store
