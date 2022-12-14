@@ -428,6 +428,13 @@ namespace Microsoft.Jupyter.Core
             try
             {
                 var serialized = EncodeForDisplay(displayable);
+                if(parent.Content is ExecuteRequestContent)
+                {
+                    var erContent = (ExecuteRequestContent)parent.Content;
+                    var code = erContent.Code;
+                    var metaData = serialized.Metadata;
+                    metaData["code"] = code;
+                }
 
                 // Send the engine's output to stdout.
                 this.ShellServer.SendIoPubMessage(
@@ -436,8 +443,8 @@ namespace Microsoft.Jupyter.Core
                         Header = new MessageHeader
                         {
                             MessageType = isUpdate
-                                          ? "update_display_data"
-                                          : "display_data"
+                                        ? "update_display_data"
+                                        : "display_data"
                         },
                         Content = new DisplayDataContent
                         {
